@@ -95,9 +95,7 @@ const AddExercise = async (db, Exercise) => {
 const GetUser = async (db, Name) => {
     return await db.select("*").from(USERS).where("Name", "=", Name).then(data => {
         let user = data[0];
-        if(user) {
-            changeObjProperty(user, "_id", "id");
-        }
+        getRequiredUserForm(user);
         return user;
     })
     .catch(err => {console.error(err)});
@@ -105,17 +103,15 @@ const GetUser = async (db, Name) => {
 const GetUserByID = async (db, id) => {
     return await db.select("*").from(USERS).where("id", "=", id).then(data => {
         let user = data[0];
-        if(user) {
-            changeObjProperty(user, "_id", "id");
-        }
+        getRequiredUserForm(user);
         return user;
     })
 }
 const GetAllUsers = async (db) => {
     return await db.select("*").from(USERS).then(data => {
-        const usersData = data.map((d)=> {
-            changeObjProperty(d, "_id", "id");
-            return d;
+        const usersData = data.map((user)=> {
+            getRequiredUserForm(user);
+            return user;
         })
         return usersData;
     })
@@ -133,7 +129,11 @@ const changeObjProperty = (obj, newName, oldName) => {
     Object.defineProperty(obj, newName, Object.getOwnPropertyDescriptor(obj, oldName));
     delete obj["id"];
 }
-
+const getRequiredUserForm = (user) => {
+    if(user) {
+        changeObjProperty(user, "_id", "id");
+    }
+}
 
 module.exports = {
     CreateAllTables,
