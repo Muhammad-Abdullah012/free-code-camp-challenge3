@@ -6,7 +6,7 @@ const knex = require('knex');
 
 //User-defined modules
 const { CreateAllTables, AddUser, AddExercise, GetAllUsers } = require('./dbWork/dbWork');
-const {USERS, EXERCISE} = require('./Constants/Constants');
+
 
 const app = express();
 
