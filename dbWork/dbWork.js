@@ -1,4 +1,4 @@
-const {EXERCISE, USERS} = require('../Constants/Constants');
+const {EXERCISE, USERS, DESCRIPTION, DURATION, DATE} = require('../Constants/Constants');
 
 //Create Tables
 const createTable = (db,name) => {
@@ -16,7 +16,6 @@ const createTable = (db,name) => {
                     default:
                         return;
                 }
-                console.log("Created Table!");
             })
             .catch(err => {
                 console.error(err);
@@ -37,9 +36,9 @@ const createUserTable = (table) => {
 }
 const createExersiceTable = (table) => {
     table.decimal("_id");
-    table.string("Description");
-    table.float("Duration");
-    table.date("Date");
+    table.string(DESCRIPTION);
+    table.float(DURATION);
+    table.date(DATE);
 }
 
 
@@ -123,6 +122,23 @@ const GetExercise = async (db, _id) => {
     })
     .catch(err => {console.error(err);})
 }
+const getAllExercises = async (db, _id) => {
+    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE).where("_id", "=", _id).then(data => {
+        return data;
+    })
+    .catch(err => {console.error(err);})
+}
+const GetExerciseLogs = async (db, id, from, to, limit) => {
+    let user = await GetUserByID(db, id);
+    if(user) {
+        let exerciseLogs = await getAllExercises(db, id);
+        if(limit) {
+            exerciseLogs.length = limit;
+        }
+        user.logs = exerciseLogs;
+    }
+    return user;
+}
 
 //----------------------------------------------------------------------//
 const changeObjProperty = (obj, newName, oldName) => {
@@ -139,5 +155,6 @@ module.exports = {
     CreateAllTables,
     AddUser,
     AddExercise,
-    GetAllUsers
+    GetAllUsers,
+    GetExerciseLogs,
 }

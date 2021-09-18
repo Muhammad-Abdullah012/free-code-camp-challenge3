@@ -5,7 +5,7 @@ const cors = require('cors');
 const knex = require('knex');
 
 //User-defined modules
-const { CreateAllTables, AddUser, AddExercise, GetAllUsers } = require('./dbWork/dbWork');
+const { CreateAllTables, AddUser, AddExercise, GetAllUsers, GetExerciseLogs } = require('./dbWork/dbWork');
 
 
 const app = express();
@@ -29,12 +29,12 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/api/users', async (req, res) => {
-  return res.json( await GetAllUsers(db));
-}).post('/api/users' , async (req, res) => {
-  return res.json(await AddUser(db, req.body.username));
-  
-});
+app.route('/api/users')
+  .get( async (req, res) => {
+    return res.json( await GetAllUsers(db));
+  }).post( async (req, res) => {
+      return res.json(await AddUser(db, req.body.username));
+    });
 
 app.post('/api/users/:_id/exercises', async (req, res) => {
   //Adding data to exercise table and returning required data....
@@ -44,6 +44,21 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
   }
   else {
     res.json("No user for this id");
+  }
+})
+
+app.get('/api/users/:_id/logs', async (req, res) => {
+  let {from, to , limit} = req.query;
+  console.log("from: ", from);
+  console.log("to: ", to);
+  console.log("limit: ", limit);
+  let id = req.params["_id"];
+  let ExLogs = await GetExerciseLogs(db, id, from, to, limit );
+  if(ExLogs) {
+    return res.json(ExLogs);
+  }
+  else {
+    res.json(`No user for id: ${id}`);
   }
 })
 
