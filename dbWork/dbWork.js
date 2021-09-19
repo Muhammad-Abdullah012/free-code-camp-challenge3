@@ -123,24 +123,64 @@ const GetExercise = async (db, _id) => {
     .catch(err => {console.error(err);})
 }
 const getAllExercises = async (db, _id) => {
-    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE).where("_id", "=", _id).then(data => {
+    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE).where(`${EXERCISE}._id`, "=", _id).then(data => {
         return data;
     })
     .catch(err => {console.error(err);})
 }
 const GetExerciseLogs = async (db, id, from, to, limit) => {
     let user = await GetUserByID(db, id);
-    if(user) {
-        let exerciseLogs = await getAllExercises(db, id);
-        if(limit) {
-            exerciseLogs.length = limit;
+    if(user) {  //if user is in db
+        let exerciseLogs = await getAllExercises(db, id);   //then get all exercise logs for that user
+        let filteredLogs = [];
+        if(from || to) {  //if from or to date is supplied
+            let fromDate = (new Date(from)).getTime();  //convert from date into milliseconds
+            let toDate = (new Date(to)).getTime();  //convert to date into milliseconds
+            filteredLogs = filterDate(fromDate, toDate, exerciseLogs, filteredLogs);    //filter exercise logs from "from date" to "to date"
+            if(filteredLogs.length === 0) { //if no match found after filtering
+                user.count = 0;
+                user.logs = filteredLogs;
+                return user;    
+            }
         }
-        user.logs = exerciseLogs;
+        if(limit) { //if limit is supplied
+            if(filteredLogs.length > 0) {   //if any logs are filtered 
+                if(limit < filteredLogs.length){    //if limit is less than filtered logs otherwise nothing to be done...
+                    filteredLogs.length = limit //apply limit to filtered logs
+                }
+            }
+            else {  //else apply limit to unfiltered/actual/complete logs
+                if(limit < exerciseLogs.length)
+                    exerciseLogs.length = limit;    
+            }
+        }
+        if(filteredLogs.length > 0) {
+            user.count = filteredLogs.length;
+            user.logs = filteredLogs;
+        }
+        else {
+            user.count = exerciseLogs.length;
+            user.logs = exerciseLogs;
+        }
     }
     return user;
 }
 
 //----------------------------------------------------------------------//
+const filterDate = (fromDate, toDate, exerciseLogs, arr) => {
+    arr = exerciseLogs.filter((exercise) => {
+        if(exercise.Date) {
+            let date = (new Date(exercise.Date)).getTime();
+            if(fromDate === null)   //if from date is not given, 
+                fromDate = 0;   // set fromDate to 0, bcz no starting limit, so start from 0
+            if(toDate === null) //if no end Date is given,
+                toDate = date;  //then just use date of exercise as limit
+            return (date >= fromDate && date <= toDate);    // ? true : false;
+        }
+        else return false;
+    });
+    return arr;
+}
 const changeObjProperty = (obj, newName, oldName) => {
     Object.defineProperty(obj, newName, Object.getOwnPropertyDescriptor(obj, oldName));
     delete obj["id"];

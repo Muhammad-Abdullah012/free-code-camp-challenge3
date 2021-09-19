@@ -49,9 +49,6 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
 app.get('/api/users/:_id/logs', async (req, res) => {
   let {from, to , limit} = req.query;
-  console.log("from: ", from);
-  console.log("to: ", to);
-  console.log("limit: ", limit);
   let id = req.params["_id"];
   let ExLogs = await GetExerciseLogs(db, id, from, to, limit );
   if(ExLogs) {
