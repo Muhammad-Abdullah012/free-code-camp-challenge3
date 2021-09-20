@@ -1,4 +1,4 @@
-const {EXERCISE, USERS, DESCRIPTION, DURATION, DATE} = require('../Constants/Constants');
+const {EXERCISE, USERS, DESCRIPTION, DURATION, DATE, NAME, _ID} = require('../Constants/Constants');
 
 //Create Tables
 const createTable = (db,name) => {
@@ -32,10 +32,10 @@ const createTable = (db,name) => {
 }
 
 const createUserTable = (table) => {
-    table.string("Name");
+    table.string(NAME);
 }
 const createExersiceTable = (table) => {
-    table.decimal("_id");
+    table.decimal(_ID);
     table.string(DESCRIPTION);
     table.float(DURATION);
     table.date(DATE);
@@ -62,7 +62,7 @@ const AddUser = async (db, UserName) => {
     }
 }
 const AddExercise = async (db, Exercise) => {
-    return await db.select("*").from(USERS).where("id", "=", Exercise[":_id"]).then(async (data) => {
+    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", Exercise[":_id"]).then(async (data) => {
         if(data.length) {
             const {date} = Exercise;
             let id = Exercise[":_id"];
@@ -92,27 +92,19 @@ const AddExercise = async (db, Exercise) => {
 
 // Retrive Data
 const GetUser = async (db, Name) => {
-    return await db.select("*").from(USERS).where("Name", "=", Name).then(data => {
-        let user = data[0];
-        getRequiredUserForm(user);
-        return user;
+    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("Name", "=", Name).then(data => {
+        return data[0];
     })
     .catch(err => {console.error(err)});
 }
 const GetUserByID = async (db, id) => {
-    return await db.select("*").from(USERS).where("id", "=", id).then(data => {
-        let user = data[0];
-        getRequiredUserForm(user);
-        return user;
+    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", id).then(data => {
+        return data[0];
     })
 }
 const GetAllUsers = async (db) => {
-    return await db.select("*").from(USERS).then(data => {
-        const usersData = data.map((user)=> {
-            getRequiredUserForm(user);
-            return user;
-        })
-        return usersData;
+    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).then(data => {
+        return data;
     })
     .catch(err=> {console.error(err);});
 }
@@ -181,7 +173,7 @@ const filterDate = (fromDate, toDate, exerciseLogs, arr) => {
     });
     return arr;
 }
-const changeObjProperty = (obj, newName, oldName) => {
+/*const changeObjProperty = (obj, newName, oldName) => {
     Object.defineProperty(obj, newName, Object.getOwnPropertyDescriptor(obj, oldName));
     delete obj["id"];
 }
@@ -189,7 +181,7 @@ const getRequiredUserForm = (user) => {
     if(user) {
         changeObjProperty(user, "_id", "id");
     }
-}
+}*/
 
 module.exports = {
     CreateAllTables,
