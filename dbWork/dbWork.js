@@ -95,30 +95,31 @@ const AddExercise = async (db, Exercise) => {
 
 // Retrive Data
 const GetUser = async (db, Name) => {
-    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("Name", "=", Name).then(data => {
+    return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("Name", "=", Name).then(data => {
         return data[0];
     })
     .catch(err => {console.error(err)});
 }
 const GetUserByID = async (db, id) => {
-    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", id).then(data => {
+    return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", id).then(data => {
         return data[0];
     })
 }
 const GetAllUsers = async (db) => {
-    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).then(data => {
+    return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).then(data => {
         return data;
     })
     .catch(err=> {console.error(err);});
 }
 const GetExercise = async (db, _id) => {
-    return await db.select("*").from(EXERCISE).where("_id", "=", _id).then(data => {
+    return await db.select(db.ref(DATE).as('date'),db.ref(DESCRIPTION).as('description'),db.ref(DURATION).as("duration")).from(EXERCISE).where("_id", "=", _id).then(data => {
         return data[0];
     })
     .catch(err => {console.error(err);})
 }
 const getAllExercises = async (db, _id) => {
-    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE)/*.where(`${EXERCISE}._id`, "=", _id)*/.then(data => {
+    console.log("id is : ", _id);
+    return await db.select(db.ref(DATE).as('date'),db.ref(DESCRIPTION).as('description'),db.ref(DURATION).as("duration")).from(EXERCISE).where(`${EXERCISE}._id`, "=", _id).then(data => {
         return data;
     })
     .catch(err => {console.error(err);})
