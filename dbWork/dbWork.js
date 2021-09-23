@@ -74,7 +74,7 @@ const AddExercise = async (db, Exercise) => {
                 _id: id,
                 Description: Exercise.description,
                 Duration: Exercise.duration,
-                Date: (date.length > 0 ) ? (new Date(date)).toDateString() : (new Date).toDateString()
+                Date: ( date ) ? (new Date(date)).toDateString() : (new Date).toDateString()
                 //if date is given, convert it toDateString and store
                 //else make new Date and convert it toDateString and store
             }).then(async () => {
