@@ -35,7 +35,8 @@ const createUserTable = (table) => {
     table.string(NAME);
 }
 const createExersiceTable = (table) => {
-    table.decimal(_ID);
+    table.decimal(_ID)
+    table.foreign(_ID).references("id").inTable(USERS);
     table.string(DESCRIPTION);
     table.float(DURATION);
     table.date(DATE);
@@ -62,7 +63,10 @@ const AddUser = async (db, UserName) => {
     }
 }
 const AddExercise = async (db, Exercise) => {
-    return await db.select(db.ref(`${NAME}`).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", Exercise[":_id"]).then(async (data) => {
+    if(!Exercise[":_id"]) {
+        return null;
+    }
+    return await db.select("id").from(USERS).where("id", "=", Exercise[":_id"]).then(async (data) => {
         if(data.length) {
             const {date} = Exercise;
             let id = Exercise[":_id"];
@@ -84,7 +88,6 @@ const AddExercise = async (db, Exercise) => {
             return null;
         }
     })
-    
 }
 
 //----------------------------------------------------------------------//
@@ -115,7 +118,7 @@ const GetExercise = async (db, _id) => {
     .catch(err => {console.error(err);})
 }
 const getAllExercises = async (db, _id) => {
-    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE).where(`${EXERCISE}._id`, "=", _id).then(data => {
+    return await db.select(DESCRIPTION, DURATION, DATE).from(EXERCISE)/*.where(`${EXERCISE}._id`, "=", _id)*/.then(data => {
         return data;
     })
     .catch(err => {console.error(err);})

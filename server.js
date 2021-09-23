@@ -35,7 +35,7 @@ app.route('/api/users')
   }).post( async (req, res) => {
       return res.json(await AddUser(db, req.body.username));
     });
-
+//You can POST to /api/users/:_id/exercises with form data description, duration, and optionally date. If no date is supplied, the current date will be used.
 app.post('/api/users/:_id/exercises', async (req, res) => {
   //Adding data to exercise table and returning required data....
   let exercise = await AddExercise(db, req.body);
@@ -43,7 +43,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     return res.json(exercise);
   }
   else {
-    res.json("No user for this id");
+    res.json("Not found");
   }
 })
 
