@@ -3,6 +3,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const knex = require('knex');
+const fs = require('fs');
 
 //User-defined modules
 const { CreateAllTables, AddUser, AddExercise, GetAllUsers, GetExerciseLogs } = require('./dbWork/dbWork');
@@ -10,10 +11,18 @@ const { CreateAllTables, AddUser, AddExercise, GetAllUsers, GetExerciseLogs } = 
 
 const app = express();
 
+
 //Create Database -----------//
 const db = knex({
   client: "sqlite3",
-  connection: { filename: './dbFile/data.db3'},
+  connection: () => { 
+    const filename = './data.db3';
+    if(!fs.existsSync(filename)){
+      let createFile = fs.createWriteStream(filename);
+      createFile.end();
+    }
+    return { filename }
+  },
   useNullAsDefault: true
 });
 CreateAllTables(db);  //Create All Tables in database.
@@ -31,7 +40,12 @@ app.get('/', (req, res) => {
 
 app.route('/api/users')
   .get( async (req, res) => {
-    return res.json( await GetAllUsers(db));
+    let allUsers = await GetAllUsers(db);
+    let a = allUsers.length;
+    for(let i = 0; i < a; i++) {
+      Object.assign(allUsers[i], {__v: 0});
+    }
+    return res.json( allUsers );
   }).post( async (req, res) => {
       return res.json(await AddUser(db, req.body.username));
     });

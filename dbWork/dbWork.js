@@ -96,17 +96,23 @@ const AddExercise = async (db, Exercise) => {
 // Retrive Data
 const GetUser = async (db, Name) => {
     return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("Name", "=", Name).then(data => {
+        data[0]._id = data[0]._id.toString();
         return data[0];
     })
     .catch(err => {console.error(err)});
 }
 const GetUserByID = async (db, id) => {
     return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).where("id", "=", id).then(data => {
+        data[0]._id = data[0]._id.toString();
         return data[0];
     })
 }
 const GetAllUsers = async (db) => {
     return await db.select(db.ref(NAME).as(`username`),db.ref(`id`).as(_ID)).from(USERS).then(data => {
+        let l = data.length;
+        for(let i = 0; i < l; i++) {
+            data[i]._id = data[i]._id.toString();
+        }
         return data;
     })
     .catch(err=> {console.error(err);});
@@ -177,15 +183,6 @@ const filterDate = (fromDate, toDate, exerciseLogs, arr) => {
     });
     return arr;
 }
-/*const changeObjProperty = (obj, newName, oldName) => {
-    Object.defineProperty(obj, newName, Object.getOwnPropertyDescriptor(obj, oldName));
-    delete obj["id"];
-}
-const getRequiredUserForm = (user) => {
-    if(user) {
-        changeObjProperty(user, "_id", "id");
-    }
-}*/
 
 module.exports = {
     CreateAllTables,
