@@ -119,12 +119,11 @@ const GetAllUsers = async (db) => {
 }
 const GetExercise = async (db, _id) => {
     return await db.select(db.ref(DATE).as('date'),db.ref(DESCRIPTION).as('description'),db.ref(DURATION).as("duration")).from(EXERCISE).where("_id", "=", _id).then(data => {
-        return data[0];
+        return data[data.length - 1];
     })
     .catch(err => {console.error(err);})
 }
 const getAllExercises = async (db, _id) => {
-    console.log("id is : ", _id);
     return await db.select(db.ref(DATE).as('date'),db.ref(DESCRIPTION).as('description'),db.ref(DURATION).as("duration")).from(EXERCISE).where(`${EXERCISE}._id`, "=", _id).then(data => {
         return data;
     })
